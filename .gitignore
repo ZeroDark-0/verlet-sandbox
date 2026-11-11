@@ -1,0 +1,26 @@
+﻿# Build outputs
+bin/
+obj/
+
+# JetBrains Rider
+.idea/
+
+# Visual Studio
+.vs/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# User-specific project files
+*.csproj.user
+
+# Logs
+*.log
+
+# Test results
+TestResults/
+
+# Temporary files
+*.tmp
+*.bak
