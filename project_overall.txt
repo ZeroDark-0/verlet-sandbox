@@ -1,0 +1,84 @@
+==============================================================
+ VERLET SANDBOX
+ A 2D physics sandbox built from scratch in C#
+==============================================================
+
+ABOUT
+--------------------------------------------------------------
+Verlet Sandbox is a 2D physics simulation that uses Verlet
+integration to create ropes, soft bodies, and cloth that react
+to gravity, collisions, and mouse input.
+
+Instead of storing velocity for each point, Verlet integration
+stores the current position and the previous position. Velocity
+is implied by the difference between them:
+
+    velocity     = current - previous
+    new position = current + velocity + gravity * dt * dt
+
+Because there is no explicit velocity, constraints such as
+"these two points must stay a fixed distance apart" can be
+enforced by moving the points directly. This keeps the
+simulation stable and makes ropes, cloth, and soft bodies simple
+to build.
+
+
+FEATURES (PLANNED)
+--------------------------------------------------------------
+  - Verlet integration for particles
+  - Distance constraints (sticks) between particles
+  - Ropes and chains
+  - Soft bodies that wobble and keep their shape
+  - Cloth simulation with pinned points
+  - Mouse interaction: drag, pull, and tear cloth
+  - Particle-to-particle and obstacle collisions
+  - Spatial hash grid for thousands of particles at 60 FPS
+
+
+TECH STACK
+--------------------------------------------------------------
+  Language ......... C#
+  Runtime .......... .NET 8+
+  Graphics ......... Raylib-cs
+  Version control .. Git / GitHub
+
+
+DEVELOPMENT ROADMAP
+--------------------------------------------------------------
+  1. Single Verlet particle with gravity and screen bounds
+  2. Multiple particles (Particle type + update/draw loop)
+  3. Distance constraints and rope
+  4. Soft bodies built from particles and sticks
+  5. Cloth grid with pinned points and mouse tearing
+  6. Collision handling
+  7. Spatial hashing optimization
+  8. Demo scene, GIF, and documentation
+
+
+PROJECT STRUCTURE
+--------------------------------------------------------------
+  VerletSandbox/
+    Program.cs        Window, main loop, rendering
+    Particle.cs       Point with current and previous position
+    Constraint.cs     Distance constraint between two particles
+    World.cs          Owns particles and constraints, runs the update
+    SpatialHash.cs    Grid for fast neighbour lookup
+    README.md         Project documentation
+
+
+BUILD AND RUN
+--------------------------------------------------------------
+  dotnet new console -n VerletSandbox
+  cd VerletSandbox
+  dotnet add package Raylib-cs
+  dotnet run
+
+
+REFERENCES
+--------------------------------------------------------------
+  - Thomas Jakobsen, "Advanced Character Physics"
+  - Raylib-cs documentation
+
+==============================================================
+
+
