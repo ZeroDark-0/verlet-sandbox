@@ -32,7 +32,7 @@ Because there is no explicit velocity, constraints such as "these two points mus
 ## Roadmap
 
 - [x] Phase 1: window, game loop, drawing, keyboard input
-- [ ] Phase 2: one falling ball (Verlet step, floor, bounce, walls)
+- [x] Phase 2: one falling ball (Verlet step, floor, bounce, walls)
 - [ ] Phase 3: many particles
 - [ ] Phase 4: constraints and rope
 - [ ] Phase 5: soft bodies and cloth
@@ -55,9 +55,7 @@ _to be written later in future._
 Requires the [.NET SDK](https://dotnet.microsoft.com/download) (version 8 or newer).
 
 ```bash
-git clone <repo-url>
-cd VerletGame
-dotnet run --project VerletGame
+git clone <https://github.com/ZeroDark-0/verlet-sandbox>
 ```
 <!--
 ## Project structure
