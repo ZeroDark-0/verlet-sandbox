@@ -2,7 +2,7 @@
 
 A 2D physics sandbox built from nothing in C# using Verlet integration, with ropes, soft bodies, and cloth.
 
-> **Status:** work in progress. Currently at Phase 1 (window and game loop).
+> **Status:** work in progress.
 
 <!--
 ![demo](docs/media/demo.gif)
