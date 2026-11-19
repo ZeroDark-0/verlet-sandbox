@@ -14,4 +14,12 @@
 - Changed `WASD` to move the ball in all directions
 
 ## Phase 3: Many particles
+- Created `Particle.cs` with `current`, `previous` and `radius`
+- Moved the Verlet step into `Update(dt, gravity)`
+- Moved the box bounce into `KeepInside(width, height)`
+- Added `Draw()` so a particle draws itself
+- Each frame: update, keep inside, draw for every particle
+- Left click spawns a new particle at the mouse position
+
+## Phase 4: constraints and rope
 ...
