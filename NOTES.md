@@ -21,5 +21,14 @@
 - Each frame: update, keep inside, draw for every particle
 - Left click spawns a new particle at the mouse position
 
-## Phase 4: constraints and rope
-...
+## Phase 4: Constraints and rope
+- Added a `pinned` flag to `Particle`; pinned particles skip `Update` and `KeepInside`
+- Created `Constraint.cs` with two particles (`a` and `b`) and a `restLength`
+- `restLength` is set from the distance between the particles when the constraint is created
+- `Solve()` measures the current distance, finds the error against `restLength`, and moves both particles half the error along the line between them
+- If one particle is pinned, the other takes the full correction; if both are pinned, nothing moves
+- Skip the solve when the distance is 0, to avoid dividing by zero
+- Each frame: update particles, solve constraints several times, keep inside the box, draw
+- Solving several times per frame (5-10 iterations) makes the rope stiffer, because one pass leaves some error that the next pass reduces
+- Built a rope as a chain of particles joined by constraints, with the first particle pinned
+- Rope stretches like rubber with too few iterations

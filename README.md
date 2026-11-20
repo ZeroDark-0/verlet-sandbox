@@ -34,7 +34,7 @@ Because there is no explicit velocity, constraints such as "these two points mus
 - [x] Phase 1: window, game loop, drawing, keyboard input
 - [x] Phase 2: one falling ball (Verlet step, floor, bounce, walls)
 - [x] Phase 3: many particles
-- [ ] Phase 4: constraints and rope
+- [x] Phase 4: constraints and rope
 - [ ] Phase 5: soft bodies and cloth
 - [ ] Phase 6: collisions
 - [ ] Phase 7: spatial hashing

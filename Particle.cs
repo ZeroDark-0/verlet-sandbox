@@ -8,16 +8,23 @@ public class Particle
     public Vector2 current;
     public Vector2 previous;
     public float radius;
-    
-    public Particle(Vector2 startPosition, float radius)
+    public bool pinned;
+
+    public Particle(Vector2 startPosition, float radius, bool pinned = false)
     {
         current = startPosition;
         previous = startPosition;
         this.radius = radius;
+        this.pinned = pinned;
     }
 
     public void Update(float dt, Vector2 acceleration, float damping)
     {
+        if (pinned)
+        {
+            return;
+        }
+
         Vector2 velocity = (current - previous) * damping;
         previous = current;
         current = current + velocity + acceleration * dt * dt;
@@ -25,6 +32,11 @@ public class Particle
 
     public void KeepInside(int width, int height, float bounce)
     {
+        if (pinned)
+        {
+            return;
+        }
+
         float leftEdge = radius;
         float rightEdge = width - radius;
         float topEdge = radius;
