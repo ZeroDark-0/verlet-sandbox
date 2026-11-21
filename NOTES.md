@@ -32,3 +32,18 @@
 - Solving several times per frame (5-10 iterations) makes the rope stiffer, because one pass leaves some error that the next pass reduces
 - Built a rope as a chain of particles joined by constraints, with the first particle pinned
 - Rope stretches like rubber with too few iterations
+
+## Phase 5: Soft bodies and cloth
+- Created `World.cs`, which owns the particle list and constraint list
+- Moved the per-frame logic out of `Program.cs` into `World.Update()` and `World.Draw()`
+- Each frame: update particles, solve constraints several times, keep particles inside the box, draw
+- Soft box: 4 corner particles joined by 4 edge constraints plus 2 diagonals
+- Without the diagonals the square collapses into a flat diamond, because edges alone don't hold the angles
+- Added a `CreateBox(position, size)` helper to spawn boxes
+- Cloth: a grid of particles, each connected to its right and bottom neighbor, so every pair is created once
+- Pinned the top row so the cloth hangs like a curtain
+- More solver iterations make the cloth stiffer and less stretchy
+- Drew the cloth as lines only, which looks more like fabric than circles
+- Mouse grab: find the nearest particle and drag it while the button is held
+- Tearing: right click removes the constraints near the mouse
+- Removing from a list while looping throws an error, so loop backwards or use `RemoveAll`

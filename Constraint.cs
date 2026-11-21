@@ -1,4 +1,5 @@
 ﻿using Raylib_cs;
+using System;
 using System.Numerics;
 
 namespace VerletGame;
@@ -53,5 +54,26 @@ public class Constraint
     public void Draw()
     {
         Raylib.DrawLineV(a.current, b.current, Color.DarkBlue);
+    }
+
+    public bool IsNear(Vector2 position, float radius)
+    {
+        Vector2 start = a.current;
+        Vector2 end = b.current;
+
+        Vector2 line = end - start;
+        float lineLengthSquared = line.LengthSquared();
+
+        if (lineLengthSquared == 0f)
+        {
+            return Vector2.Distance(position, start) <= radius;
+        }
+
+        float t = Vector2.Dot(position - start, line) / lineLengthSquared;
+        t = Math.Clamp(t, 0f, 1f);
+
+        Vector2 closestPoint = start + line * t;
+
+        return Vector2.Distance(position, closestPoint) <= radius;
     }
 }

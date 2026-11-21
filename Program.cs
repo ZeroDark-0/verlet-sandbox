@@ -13,94 +13,64 @@ internal class Program
         Raylib.InitWindow(ScreenWidth, ScreenHeight, "VerletSandbox");
         Raylib.SetTargetFPS(60);
 
-        float ballRadius = 10f;
-        float bounce = 0.9f;
-        float damping = 1f;
-        int solverIterations = 5;
+        World world = new World(ScreenWidth, ScreenHeight);
 
-        List<Particle> particles = new List<Particle>();
-        List<Constraint> constraints = new List<Constraint>();
-
-        int ropeParticleCount = 15;
-        float ropeSpacing = 20f;
-        Vector2 ropeStart = new Vector2(ScreenWidth / 2f, 100f);
-
-        for (int i = 0; i < ropeParticleCount; i++)
+        while (!Raylib.WindowShouldClose())
         {
-            bool pinned = i == 0;
-            Vector2 position = ropeStart + new Vector2(i * 5f, i * ropeSpacing);
+            const float dt = 1f / 60f;
 
-            Particle particle = new Particle(position, ballRadius, pinned);
-            particles.Add(particle);
+            Vector2 mousePosition = Raylib.GetMousePosition();
 
-            if (i > 0)
+            if (Raylib.IsKeyPressed(KeyboardKey.B))
             {
-                Particle previousParticle = particles[i - 1];
-                constraints.Add(new Constraint(previousParticle, particle));
+                world.CreateBox(mousePosition, 80f);
             }
+
+            if (Raylib.IsKeyPressed(KeyboardKey.C))
+            {
+                world.CreateCloth(mousePosition, 20, 15, 18f);
+            }
+
+            if (Raylib.IsMouseButtonPressed(MouseButton.Left))
+            {
+                world.StartGrab(mousePosition, 35f);
+            }
+
+            if (Raylib.IsMouseButtonDown(MouseButton.Left))
+            {
+                world.DragGrabbed(mousePosition);
+            }
+
+            if (Raylib.IsMouseButtonReleased(MouseButton.Left))
+            {
+                world.EndGrab();
+            }
+
+            if (Raylib.IsMouseButtonDown(MouseButton.Middle))
+            {
+                world.DragRopeEnd(mousePosition);
+            }
+            else
+            {
+                world.ReleaseRopeEnd();
+            }
+
+            if (Raylib.IsMouseButtonPressed(MouseButton.Right))
+            {
+                world.Tear(mousePosition, 25f);
+            }
+
+            world.Update(dt);
+
+            Raylib.BeginDrawing();
+            Raylib.ClearBackground(Color.Black);
+
+            Raylib.DrawText("Left: grab | Right: tear | Middle: drag rope | B: box | C: cloth", 10, 10, 20, Color.White);
+
+            world.Draw();
+
+            Raylib.EndDrawing();
         }
-
-        Particle ropeEndParticle = particles[particles.Count - 1];
-
-        Vector2 gravity = new Vector2(0f, 1000f);
-        
-            while (!Raylib.WindowShouldClose())
-            {
-                const float dt = 1f / 60f;
-            
-                if (Raylib.IsMouseButtonPressed(MouseButton.Left))
-                {
-                    particles.Add(new Particle(Raylib.GetMousePosition(), ballRadius));
-                }
-
-                if (Raylib.IsMouseButtonDown(MouseButton.Right))
-                {
-                    Vector2 mousePosition = Raylib.GetMousePosition();
-
-                    ropeEndParticle.pinned = true;
-                    ropeEndParticle.current = mousePosition;
-                    ropeEndParticle.previous = mousePosition;
-                }
-                else
-                {
-                    ropeEndParticle.pinned = false;
-                }
-
-                foreach (Particle particle in particles)
-                {
-                    particle.Update(dt, gravity, damping);
-                }
-
-                for (int i = 0; i < solverIterations; i++)
-                {
-                    foreach (Constraint constraint in constraints)
-                    {
-                        constraint.Solve();
-                    }
-                }
-
-                foreach (Particle particle in particles)
-                {
-                    particle.KeepInside(ScreenWidth, ScreenHeight, bounce);
-                }
-
-                Raylib.BeginDrawing();
-                Raylib.ClearBackground(Color.Black);
-
-                Raylib.DrawText("Left click: spawn ball | Right mouse: drag rope end", 10, 10, 20, Color.White);
-
-                foreach (Constraint constraint in constraints)
-                {
-                    constraint.Draw();
-                }
-            
-                foreach (Particle particle in particles)
-                {
-                    particle.Draw();
-                }
-
-                Raylib.EndDrawing();
-            }
 
         Raylib.CloseWindow();
     }
