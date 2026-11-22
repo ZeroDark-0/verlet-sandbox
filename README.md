@@ -36,7 +36,7 @@ Because there is no explicit velocity, constraints such as "these two points mus
 - [x] Phase 3: many particles
 - [x] Phase 4: constraints and rope
 - [x] Phase 5: soft bodies and cloth
-- [ ] Phase 6: collisions
+- [x] Phase 6: collisions
 - [ ] Phase 7: spatial hashing
 - [ ] Phase 8: demo scene and documentation
 

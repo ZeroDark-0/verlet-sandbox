@@ -74,4 +74,9 @@ public class Particle
         Raylib.DrawCircleV(current, radius, Color.White);
     }
 
+    public void Draw(Color color)
+    {
+        Raylib.DrawCircleV(current, radius, color);
+    }
+
 }

@@ -26,6 +26,11 @@ internal class Program
                 world.CreateBox(mousePosition, 80f);
             }
 
+            if (Raylib.IsKeyPressed(KeyboardKey.V))
+            {
+                world.SpawnParticle(mousePosition);
+            }
+
             if (Raylib.IsKeyPressed(KeyboardKey.C))
             {
                 world.CreateCloth(mousePosition, 20, 15, 18f);
@@ -65,7 +70,7 @@ internal class Program
             Raylib.BeginDrawing();
             Raylib.ClearBackground(Color.Black);
 
-            Raylib.DrawText("Left: grab | Right: tear | Middle: drag rope | B: box | C: cloth", 10, 10, 20, Color.White);
+            Raylib.DrawText("Left: grab | Right: tear | Middle: drag rope | B: box | V: circle | C: cloth", 10, 10, 20, Color.White);
 
             world.Draw();
 

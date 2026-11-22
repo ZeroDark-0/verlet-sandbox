@@ -28,8 +28,21 @@ public class World
         this.screenHeight = screenHeight;
 
         CreateRope();
-        CreateBox(new Vector2(500f, 200f), 120f);
         CreateCloth(new Vector2(200f, 100f), 20, 15, 18f);
+    }
+
+    private void CreatePinnedBallLine()
+    {
+        float y = screenHeight - screenHeight / 3f;
+        float gap = ballRadius * 3f;
+        float startX = ballRadius * 2f;
+        float endX = screenWidth - ballRadius * 2f;
+
+        for (float x = startX; x <= endX; x += gap)
+        {
+            Particle particle = new Particle(new Vector2(x, y), ballRadius, true);
+            particles.Add(particle);
+        }
     }
 
     private void CreateRope()
@@ -174,6 +187,7 @@ public class World
     }
 
     public void EndGrab()
+    
     {
         if (grabbedParticle == null)
         {
@@ -197,11 +211,71 @@ public class World
             {
                 constraint.Solve();
             }
-        }
 
-        foreach (Particle particle in particles)
+            SolveCollisions();
+
+            foreach (Particle particle in particles)
+            {
+                particle.KeepInside(screenWidth, screenHeight, bounce);
+            }
+        }
+    }
+
+    private void SolveCollisions()
+    {
+        for (int i = 0; i < particles.Count; i++)
         {
-            particle.KeepInside(screenWidth, screenHeight, bounce);
+            for (int j = i + 1; j < particles.Count; j++)
+            {
+                Particle a = particles[i];
+                Particle b = particles[j];
+
+                if (hiddenParticles.Contains(a) || hiddenParticles.Contains(b))
+                {
+                    continue;
+                }
+
+                Vector2 difference = b.current - a.current;
+                float distanceSquared = difference.LengthSquared();
+
+                float minimumDistance = a.radius + b.radius;
+                float minimumDistanceSquared = minimumDistance * minimumDistance;
+
+                if (distanceSquared >= minimumDistanceSquared)
+                {
+                    continue;
+                }
+
+                float distance = MathF.Sqrt(distanceSquared);
+
+                if (distance == 0f)
+                {
+                    continue;
+                }
+
+                Vector2 direction = difference / distance;
+                float overlap = minimumDistance - distance;
+                Vector2 correction = direction * overlap;
+
+                if (a.pinned && b.pinned)
+                {
+                    continue;
+                }
+
+                if (a.pinned)
+                {
+                    b.current += correction;
+                }
+                else if (b.pinned)
+                {
+                    a.current -= correction;
+                }
+                else
+                {
+                    a.current -= correction * 0.5f;
+                    b.current += correction * 0.5f;
+                }
+            }
         }
     }
 
@@ -228,6 +302,37 @@ public class World
             if (constraints[i].IsNear(mousePosition, tearRadius))
             {
                 constraints.RemoveAt(i);
+            }
+        }
+    }
+
+    public bool AreOverlapping(Particle a, Particle b)
+    {
+        float radiusSum = a.radius + b.radius;
+        float radiusSumSquared = radiusSum * radiusSum;
+
+        float distanceSquared = Vector2.DistanceSquared(a.current, b.current);
+
+        return distanceSquared < radiusSumSquared;
+    }
+
+    public void CheckOverlaps()
+    {
+        for (int i = 0; i < particles.Count; i++)
+        {
+            for (int j = i + 1; j < particles.Count; j++)
+            {
+                Particle a = particles[i];
+                Particle b = particles[j];
+
+                float radiusSum = a.radius + b.radius;
+                float radiusSumSquared = radiusSum * radiusSum;
+                float distanceSquared = Vector2.DistanceSquared(a.current, b.current);
+
+                if (distanceSquared < radiusSumSquared)
+                {
+                    Console.WriteLine("Overlap!");
+                }
             }
         }
     }
