@@ -8,13 +8,19 @@ public class World
     private readonly List<Particle> particles = new List<Particle>();
     private readonly List<Constraint> constraints = new List<Constraint>();
     private readonly HashSet<Particle> hiddenParticles = new HashSet<Particle>();
+    private readonly SpatialHash spatialHash = new SpatialHash(40f);
+    private readonly Random random = new Random();
+
+    private bool drawSpatialHashGrid = false;
+
+    public int ParticleCount => particles.Count;
 
     private readonly int screenWidth;
     private readonly int screenHeight;
 
     private readonly float ballRadius = 10f;
     private readonly float bounce = 0.9f;
-    private readonly float damping = 1f;
+    private readonly float damping = 0.99f;
     private readonly int solverIterations = 12;
 
     private readonly Vector2 gravity = new Vector2(0f, 1000f);
@@ -27,8 +33,26 @@ public class World
         this.screenWidth = screenWidth;
         this.screenHeight = screenHeight;
 
+        ResetToDefaultLayout();
+    }
+
+    public void ResetToDefaultLayout()
+    {
+        Clear();
+
         CreateRope();
-        CreateCloth(new Vector2(200f, 100f), 20, 15, 18f);
+        CreateCloth(new Vector2(100f, 100f), 20, 15, 18f);
+    }
+
+    public void Clear()
+    {
+        particles.Clear();
+        constraints.Clear();
+        hiddenParticles.Clear();
+        spatialHash.Clear();
+
+        ropeEndParticle = null;
+        grabbedParticle = null;
     }
 
     private void CreatePinnedBallLine()
@@ -49,7 +73,7 @@ public class World
     {
         int ropeParticleCount = 15;
         float ropeSpacing = 20f;
-        Vector2 ropeStart = new Vector2(screenWidth / 2f, 300f);
+        Vector2 ropeStart = new Vector2(screenWidth / 2f, 100f);
 
         for (int i = 0; i < ropeParticleCount; i++)
         {
@@ -97,6 +121,17 @@ public class World
         particles.Add(new Particle(position, ballRadius));
     }
 
+    public void SpawnBenchmarkParticles(int count)
+    {
+        for (int i = 0; i < count; i++)
+        {
+            float x = random.NextSingle() * screenWidth;
+            float y = random.NextSingle() * screenHeight * 0.25f;
+
+            SpawnParticle(new Vector2(x, y));
+        }
+    }
+
     public void CreateCloth(Vector2 startPosition, int columns, int rows, float spacing)
     {
         Particle[,] clothParticles = new Particle[columns, rows];
@@ -139,6 +174,11 @@ public class World
 
     public void DragRopeEnd(Vector2 position)
     {
+        if (ropeEndParticle == null)
+        {
+            return;
+        }
+
         ropeEndParticle.pinned = true;
         ropeEndParticle.current = position;
         ropeEndParticle.previous = position;
@@ -146,6 +186,11 @@ public class World
 
     public void ReleaseRopeEnd()
     {
+        if (ropeEndParticle == null)
+        {
+            return;
+        }
+
         ropeEndParticle.pinned = false;
     }
 
@@ -211,7 +256,9 @@ public class World
             {
                 constraint.Solve();
             }
+            
 
+            RebuildSpatialHash();
             SolveCollisions();
 
             foreach (Particle particle in particles)
@@ -221,16 +268,49 @@ public class World
         }
     }
 
+    private void RebuildSpatialHash()
+    {
+        spatialHash.Clear();
+
+        foreach (Particle particle in particles)
+        {
+            spatialHash.Insert(particle);
+        }
+    }
+
     private void SolveCollisions()
     {
+        Dictionary<Particle, int> particleIndexes = new Dictionary<Particle, int>();
+
         for (int i = 0; i < particles.Count; i++)
         {
-            for (int j = i + 1; j < particles.Count; j++)
-            {
-                Particle a = particles[i];
-                Particle b = particles[j];
+            particleIndexes[particles[i]] = i;
+        }
 
-                if (hiddenParticles.Contains(a) || hiddenParticles.Contains(b))
+        for (int i = 0; i < particles.Count; i++)
+        {
+            Particle a = particles[i];
+
+            if (hiddenParticles.Contains(a))
+            {
+                continue;
+            }
+
+            foreach (Particle b in spatialHash.GetNearbyParticles(a))
+            {
+                if (a == b)
+                {
+                    continue;
+                }
+
+                if (hiddenParticles.Contains(b))
+                {
+                    continue;
+                }
+
+                int bIndex = particleIndexes[b];
+
+                if (bIndex <= i)
                 {
                     continue;
                 }
@@ -279,8 +359,18 @@ public class World
         }
     }
 
+    public void ToggleSpatialHashGrid()
+    {
+        drawSpatialHashGrid = !drawSpatialHashGrid;
+    }
+
     public void Draw()
     {
+        if (drawSpatialHashGrid)
+        {
+            spatialHash.DrawDebugGrid(screenWidth, screenHeight);
+        }
+
         foreach (Constraint constraint in constraints)
         {
             constraint.Draw();

@@ -47,3 +47,27 @@
 - Mouse grab: find the nearest particle and drag it while the button is held
 - Tearing: right click removes the constraints near the mouse
 - Removing from a list while looping throws an error, so loop backwards or use `RemoveAll`
+
+## Phase 6: Collisions
+- Two particles overlap when the distance between centers is less than the sum of their radii
+- Compared squared distances first, so a square root is only taken when there is a real collision
+- On overlap: overlap = (r1 + r2) - distance, then move each particle half of it in opposite directions along the line between them
+- Same pattern as `Constraint.Solve()`, but it only acts when the distance is too small
+- Skip the push when the distance is 0, to avoid dividing by zero
+- Pinned particles don't move, so the other particle takes the full correction
+- Checked every pair once with a nested loop (inner index starts at `i + 1`)
+- Collisions run inside the same iteration loop as constraints, so they settle together
+- Particles joined by a constraint sit closer than their radii, so they fight the constraint and jitter; skipped collisions between them
+- Resting piles jitter a little, because position-based contact is never perfectly still
+- Checking every pair is O(n²); the frame rate dropped below 60 FPS at about 800 particles
+
+## Phase 7: Spatial hashing
+- Divided the window into a grid of square cells; each frame every particle goes into the cell containing its position
+- Cell size is at least 2 × the largest radius, so a particle can only touch its own cell and the 8 around it
+- Cell index = `MathF.Floor(position / cellSize)`, because casting a negative float to `int` rounds toward zero
+- Each frame: clear the grid, insert all particles, then solve collisions using only nearby cells
+- Avoided checking each pair twice by only handling pairs where one index is smaller
+- Reused the cell lists and called `Clear()` instead of allocating new ones, to avoid garbage collection pauses
+- Built the grid once per frame, which was good enough
+- Cell size too small misses collisions; too large goes back toward O(n²)
+- A spatial hash is faster because each particle is only compared with nearby ones instead of all of them, so the cost grows roughly with the particle count
