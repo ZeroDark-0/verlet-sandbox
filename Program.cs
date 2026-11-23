@@ -8,21 +8,21 @@ internal class Program
     [System.STAThread]
     public static void Main()
     {
-        const int ScreenWidth = 1280;
-        const int ScreenHeight = 960;
+        const int ScreenWidth = 1920;
+        const int ScreenHeight = 1080;
         Raylib.InitWindow(ScreenWidth, ScreenHeight, "VerletSandbox");
         Raylib.SetTargetFPS(60);
 
             World world = new World(ScreenWidth, ScreenHeight);
 
-            bool benchmarkRunning = false;
-            bool benchmarkFinished = false;
-            int benchmarkResultParticleCount = 0;
+            var benchmarkRunning = false;
+            var benchmarkFinished = false;
+            var benchmarkResultParticleCount = 0;
 
             const int benchmarkParticlesPerFrame = 20;
             const int benchmarkStopFps = 50;
 
-            double vHoldStartTime = 0.0;
+            var vHoldStartTime = 0.0;
             double lastCircleSpawnTime = 0.0;
             const double circleHoldDelay = 0.25;
             const double circleSpawnInterval = 0.05;
@@ -133,6 +133,7 @@ world.Update(dt);
             Raylib.DrawText($"Particles: {world.ParticleCount}", 10, 35, 20, Color.White);
             Raylib.DrawText("Left: grab | Right: tear | Middle: drag rope | B: box | V: circle | C: cloth | G: grid | X: benchmark | Z: reset", 10, 60, 20, Color.White);
 
+            
             if (benchmarkRunning)
             {
                 Raylib.DrawText($"Benchmark running... adding {benchmarkParticlesPerFrame} particles/frame", 10, 85, 20, Color.Yellow);

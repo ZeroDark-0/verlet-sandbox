@@ -41,7 +41,7 @@ public class World
         Clear();
 
         CreateRope();
-        CreateCloth(new Vector2(100f, 100f), 20, 15, 18f);
+        CreateCloth(new Vector2(200f, 200f), 20, 15, 18f);
     }
 
     public void Clear()
@@ -73,7 +73,7 @@ public class World
     {
         int ropeParticleCount = 15;
         float ropeSpacing = 20f;
-        Vector2 ropeStart = new Vector2(screenWidth / 2f, 100f);
+        Vector2 ropeStart = new Vector2(screenWidth / 2f, 200f);
 
         for (int i = 0; i < ropeParticleCount; i++)
         {
